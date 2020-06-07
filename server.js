@@ -1,11 +1,14 @@
 const express=require('express');
 const app=express();
 const morgan=require('morgan');
-const port =process.env.PORT || 3000 ;
+const port =process.env.PORT || 8080 ;
 
 
+//bring in db
+const connectDB=require('./config/db');
+connectDB();
 app.use(morgan('dev'));
-app.use(express.json());
+app.use(express.json({extended:false}));
 
 
 //require routes
