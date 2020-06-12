@@ -1,12 +1,15 @@
 const express=require('express');
 const app=express();
 const morgan=require('morgan');
+const cors=require('cors');
 const port =process.env.PORT || 8080 ;
 
 
 //bring in db
 const connectDB=require('./config/db');
 connectDB();
+
+app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json({extended:false}));
 
