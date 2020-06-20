@@ -3,30 +3,50 @@ import Navbar from './components/layout/Navbar';
 import {BrowserRouter as Router, Route, Switch} from 'react-router-dom';
 import Home from './components/pages/Home';
 import About from './components/pages/About';
-import ContactState from './context/contact/ContactState'
-;import './App.css';
+import Register from './components/auth/Register';
+import setAuthToken from './setAuthToken';
+import Login from './components/auth/Login';
+import PrivateRoute from './components/routing/PrivateRoute';
+import Alert from './components/layout/Alert';
+import ContactState from './context/contact/ContactState';
+import AuthState from './context/auth/AuthState';
+import AlertState from './context/alert/AlertState';
+import './App.css';
+
+if(localStorage.token){
+  setAuthToken(localStorage.token)
+
+}
 
 const App= ()=> {
   return (
-    <ContactState>
-      <Router>
+    <AuthState>
+      <ContactState>
+        <AlertState>
+        <Router>
 
-        <Fragment>
-          < Navbar />
-  
-        <div className="container">
-            <Switch>
-              <Route exact path='/' component={Home}/>
-              <Route exact path='/about' component={About}/>
-              
+          <Fragment>
+            < Navbar />
+    
+          <div className="container">
+             <Alert />
+              <Switch>
+                
+                <Route exact path='/register' component={Register}/>
+                <Route exact path='/login' component={Login}/>
+                <PrivateRoute exact path='/' component={Home}/>
+                <PrivateRoute exact path='/about' component={About}/>
+                
 
-              
-            </Switch>
-        </div>
-        
-        </Fragment>
-      </Router>
-    </ContactState>
+                
+              </Switch>
+          </div>
+          
+          </Fragment>
+        </Router>
+        </AlertState>
+      </ContactState>
+    </AuthState>
 
   );
 }

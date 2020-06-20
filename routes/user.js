@@ -22,13 +22,13 @@ router.post('/',
 
     }
    const  {name,email}=req.body;
-    const salt=await bcrypt.genSalt(10);
-    const password=await bcrypt.hash(req.body.password,salt);
-
+    
     const userExists= await User.findOne({email:email});
     if(userExists){
         return res.status(400).json({msg:'user already exists'})
     };
+    const salt=await bcrypt.genSalt(10);
+    const password=await bcrypt.hash(req.body.password,salt);
 
     let user= await new User({
         name,
@@ -41,6 +41,8 @@ router.post('/',
             id:user.id
         }
     }
+   // console.log(user);
+    //console.log(payload);
     // const token=jwt.sign(payload,config.get("secret"),{expiresIn:3600})
     // res.header('auth',token).send(token);
    // res.send(savedUser)
