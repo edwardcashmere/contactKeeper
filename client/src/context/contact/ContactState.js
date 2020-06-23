@@ -1,75 +1,122 @@
 import React,{useReducer} from 'react';
 import ContactContext from './contactContext';
 import contactReducer from './contactReducer';
-import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
 
 import {
+    GET_CONTACT,
     ADD_CONTACT,
     UPDATE_CONTACT,
     DELETE_CONTACT,
     SET_CURRENT,
     CLEAR_CURRENT,
     FILTER_CONTACT,
-    CLEAR_FILTER
+    CLEAR_FILTER,
+    CONTACT_ERROR,
+    CLEAR_CONTACT
     
 } from '../types';
 
 const ContactSate= props=>{
     const initalState={
-        contacts:[
-            {
-                id:1,
-                name:'sarah conor',
-                email:'sarah@term.com',
-                phone:'111-111-111',
-                type:'personal'
-            },
-            {
-                id:2,
-                name:'kobe bryant',
-                email:'bryanth@laker.com',
-                phone:'222-222-222',
-                type:'professional'
-            },
-            {
-                id:3,
-                name:'Jeff Shreeves',
-                email:'Jeff@ea.com',
-                phone:'333-333-333',
-                type:'personal'
-            }
-            
-        ],
+        contacts: null,
         current:null,
-        filtered:null
+        filtered:null,
+        error:null
     }
     const [state,dispatch]=useReducer(contactReducer,initalState);
     
 
     //Add Contactct
-    const addContact=(contact)=>{
-        contact.id=uuidv4();
-        dispatch({
-            type:ADD_CONTACT,
-            payload:contact
-        })
-    }
+    const addContact=async(contact)=>{
+        const config = {
+            headers : {
+                'Content-Type':'application/json'
+            }
+        }
+        try {
+            const res = await axios.post('/api/contact',contact,config);
+            dispatch({
+                type:ADD_CONTACT,
+                payload:res.data  })
 
+        } catch (err) {
+            dispatch({
+                type:CONTACT_ERROR,
+                payload:err.reponse.data.msg
+            })
+            
+        }
+        
+       
+      
+    }
+//Get Contacts
+   const getContact=async(contact)=>{
+    
+    try {
+        const res = await axios.get('/api/contact');
+        dispatch({
+            type:GET_CONTACT,
+            payload:res.data  })
+
+    } catch (err) {
+        dispatch({
+            type:CONTACT_ERROR,
+            payload:err.response.data.msg
+        })
+        
+    }
+    
+   
+  
+}
 
     //Delete Contact
-    const deleteContact=(id)=>{
+    const deleteContact=async(id)=>{
+        try {
+             await axios.delete(`/api/contact/${id}`);
+            dispatch({
+                type:DELETE_CONTACT,
+                payload:id
+            });
+           
+        } catch (err) {
+            dispatch({
+                type:CONTACT_ERROR,
+                payload:err.response.data.msg
+            })
+            
+        }
+        
+    }
+      //clear Contact
+      const clearContacts=()=>{
         dispatch({
-            type:DELETE_CONTACT,
-            payload:id
+            type: CLEAR_CONTACT
         })
     }
 
     //Update Contact
-    const updateContact=contact=>{
-        dispatch({
-            type:UPDATE_CONTACT,
-            payload:contact
-        });
+    const updateContact=async (contact) =>{
+        const config = {
+            headers : {
+                'Content-Type':'application/json'
+            }
+        }
+        try {
+            const res = await axios.put(`/api/contact/${contact._id}`,contact,config);
+            dispatch({
+                type:UPDATE_CONTACT,
+                payload:res.data  })
+
+        } catch (err) {
+            dispatch({
+                type:CONTACT_ERROR,
+                payload:err.reponse.data.msg
+            })
+            
+        }
     }
 
 
@@ -119,13 +166,16 @@ const setFilter=(text)=>{
             contacts:state.contacts,
             current:state.current,
             filtered: state.filtered,
+            error: state.error,
             addContact,
             deleteContact,
             setCurrent,
             clearCurrent,
             updateContact,
             setFilter,
-            clearFilter
+            clearFilter,
+            getContact,
+            clearContacts
             
         }}
         >
