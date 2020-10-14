@@ -18,14 +18,14 @@ router.post('/',
     try{
         const errors=validationResult(req);
     if(!errors.isEmpty()){
-      return  res.status(400).send(errors.array())
+      return  res.status(400).json({error:errors.array()})
 
     }
    const  {name,email}=req.body;
     
     const userExists= await User.findOne({email:email});
     if(userExists){
-        return res.status(400).json({msg:'user already exists'})
+        return res.status(400).json({msg:'user already exists with this email'})
     };
     const salt=await bcrypt.genSalt(10);
     const password=await bcrypt.hash(req.body.password,salt);
